@@ -1,0 +1,46 @@
+version: '3.8'
+networks:
+  utn:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.24.2.0/24"
+
+volumes:
+  postgres-db:
+    external: false
+
+services:
+  servidor:
+    image: postgres:alpine
+    container_name: servidor
+    restart: always
+    env_file:
+      - .env.db
+    environment:
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=trust
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    networks:
+      utn:
+        ipv4_address: 172.24.2.10
+  venta1:
+    image: postgres:alpine
+    container_name: venta1
+    restart: always
+    env_file:
+      - .env.db
+    networks:
+      utn:
+        ipv4_address: 172.24.2.31
+  
+
+
