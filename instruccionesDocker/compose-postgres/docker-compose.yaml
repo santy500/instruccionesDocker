@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 networks:
   utn:
     driver: bridge
@@ -17,7 +17,7 @@ services:
     container_name: servidor
     restart: always
     env_file:
-      - .env.db
+      - env.db
     environment:
       - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=trust
     healthcheck:
@@ -37,10 +37,20 @@ services:
     container_name: venta1
     restart: always
     env_file:
-      - .env.db
+      - env.db
     networks:
       utn:
         ipv4_address: 172.24.2.31
-  
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: always
+    env_file:
+      - env.db
+    ports:
+      - 80:80
+    depends_on:
+    - servidor
+    networks:
+    - utn
 
 
